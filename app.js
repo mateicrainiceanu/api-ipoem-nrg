@@ -1,9 +1,8 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-const {google, openai, lngDet, wordpos} = require("./middleware.js");
+const {google, openai, lngDet, wordpos, client, options} = require("./middleware.js");
 const cors = require('cors');
-
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -61,10 +60,10 @@ app.post("/poem", async (req, res) => {
 app.post("/images", async (req, res) => {
 
     const query = req.body.t || "random"
-    const results = await google.scrape(query, 1);
+    const results = await client.search(query, options);
     const img = {
         url: results[0].url,
-        alt: results[0].title
+        alt: results[0].snippet
     };
 
     res.json(img)
@@ -77,11 +76,11 @@ app.post("/poem/custom", async (req, res)=> {
     //GETTING THE IMAGE BASED ON USER'S PROMPT
 
     var imageKeyWord = await getNounFrom(prompt);
-    const query = imageKeyWord || "world"
-    const results = await google.scrape(query, 1);
+    const query = req.body.t || "random"
+    const results = await client.search(query, options);
     const img = {
         url: results[0].url,
-        alt: results[0].title
+        alt: results[0].snippet
     };
 
     //GETTING CHAT-GPT'S POEM
@@ -133,6 +132,8 @@ function getLangShort(language){
     return lang;
 }
 
-app.listen(process.env.PORT || 3001, () => {
-    console.log("Server started!");
+const port = process.env.PORT || 3001
+
+app.listen(port, () => {
+    console.log("Server started on port " + port);
 })
