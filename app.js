@@ -76,8 +76,7 @@ app.post("/poem/custom", async (req, res)=> {
     //GETTING THE IMAGE BASED ON USER'S PROMPT
 
     var imageKeyWord = await getNounFrom(prompt);
-    const query = req.body.t || "random"
-    const results = await client.search(query, options);
+    const results = await client.search(imageKeyWord, options);
     const img = {
         url: results[0].url,
         alt: results[0].snippet
